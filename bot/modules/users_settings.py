@@ -24,16 +24,15 @@ from bot.helper.ext_utils.bot_utils import update_user_ldata, get_readable_file_
 
 handler_dict = {}
 fname_dict = {'rcc': 'RClone',
-             'prefix': 'Prefix',
-             'suffix': 'Suffix',
-             'remname': 'Remname',
-             'ldump': 'Dump',
-             'user_tds': 'User Custom TDs',
-             'lcaption': 'Caption',
-             'thumb': 'Thumbnail',
-             'yt_opt': 'YT-DLP Options',
-             'split_size': 'Leech Splits',
-             }
+              'prefix': 'Prefix',
+              'suffix': 'Suffix',
+              'remname': 'Remname',
+              'ldump': 'Dump',
+              'user_tds': 'User Custom TDs',
+              'lcaption': 'Caption',
+              'thumb': 'Thumbnail',
+              'yt_opt': 'YT-DLP Options',
+              'split_size': 'Leech Splits'}
 
 async def get_user_settings(from_user, key=None, edit_type=None, edit_mode=None):
     user_id = from_user.id
@@ -189,7 +188,7 @@ async def user_settings(client, message):
     thumbnail = f"Thumbnails/{user_id}.jpg"
     if not ospath.exists(thumbnail):
         thumbnail = 'https://graph.org/file/73ae908d18c6b38038071.jpg'
-    x = await message.reply_photo(thumbnail, caption=msg, reply_markup=button)
+    x = await sendMessage(message, msg, button, thumbnail)
     await five_minute_del(message)
     await deleteMessage(x)
 

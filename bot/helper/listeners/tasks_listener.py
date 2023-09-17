@@ -34,7 +34,7 @@ from bot.helper.ext_utils.db_handler import DbManager
 
 
 class MirrorLeechListener:
-    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None):
+    def __init__(self, message, compress=False, extract=False, isQbit=False, isLeech=False, tag=None, select=False, seed=False, sameDir=None, rcFlags=None, upPath=None, isClone=False, join=False, isYtdlp=False, drive_id=None, index_link=None, leech_utils={}):
         if sameDir is None:
             sameDir = {}
         self.message = message
@@ -64,6 +64,7 @@ class MirrorLeechListener:
         self.__setModeEng()
         self.drive_id = drive_id
         self.index_link = index_link
+        self.leech_utils = leech_utils
 
     async def clean(self):
         try:
@@ -371,7 +372,6 @@ class MirrorLeechListener:
         msg += f'<b>• Size: </b>{get_readable_file_size(size)}\n'
         msg += f'<b>• Elapsed: </b>{get_readable_time(time() - self.message.date.timestamp())}\n'
         msg += f'<b>• Mode: </b>{self.upload_details["mode"]}\n'
-        lmsg = '<b>Files have been sent. Access them via the provided links.</b>'
         LOGGER.info(f'Task Done: {name}')
         buttons = ButtonMaker()
         if self.isLeech:
@@ -387,6 +387,7 @@ class MirrorLeechListener:
             else:
                 attachmsg = True
                 fmsg, totalmsg = '\n\n', ''
+                lmsg = '<b>Files have been sent. Access them via the provided links.</b>'
                 for index, (link, name) in enumerate(files.items(), start=1):
                     fmsg += f"{index}. <a href='{link}'>{name}</a>\n"
                     totalmsg = (msg + lmsg + fmsg) if attachmsg else fmsg
@@ -408,7 +409,7 @@ class MirrorLeechListener:
                 if self.isSuperGroup:
                     btn.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
                     btn = extra_btns(btn)
-                    await sendMessage(self.message, msg + '<b>Files has been sent to your inbox</b>', btn.build_menu(1))
+                    await sendMessage(self.message, f'{msg} <b>Files has been sent to your inbox</b>', btn.build_menu(1))
                 else:
                     await deleteMessage(self.botpmmsg)
             if self.seed:
@@ -443,9 +444,7 @@ class MirrorLeechListener:
                         share_url = f'{INDEX_URL}/{url_path}'
                         if mime_type == "Folder":
                             share_url += '/'
-                            buttons.ubutton('Index link', share_url)
-                        else:
-                            buttons.ubutton('Index link', share_url)
+                        buttons.ubutton('Index link', share_url)
                 buttons = extra_btns(buttons)
                 button = buttons.build_menu(2)
             else:
@@ -459,14 +458,13 @@ class MirrorLeechListener:
                 log_msg = list((await sendMultiMessage(config_dict['MIRROR_LOG_ID'], msg, buttonss)).values())[0]
                 if self.linkslogmsg:
                     await deleteMessage(self.linkslogmsg)
-            
             buttons = ButtonMaker()
             await sendMessage(self.botpmmsg, msg, button, self.random_pic)
             await deleteMessage(self.botpmmsg)
             if self.isSuperGroup:
                 buttons.ibutton('View in inbox', f"aeon {user_id} botpm", 'header')
                 buttons = extra_btns(buttons)
-                await sendMessage(self.message, msg + '<b>Links has been sent to your inbox</b>', buttons.build_menu(1))
+                await sendMessage(self.message, f'{msg} <b>Links has been sent to your inbox</b>', buttons.build_menu(1))
             else:
                 await deleteMessage(self.botpmmsg)
             if self.seed:
